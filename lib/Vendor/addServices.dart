@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:spa69/Vendor/VendorHomeScreen.dart';
+import 'package:spa69/commonFunction/allcommfunc.dart';
 import 'dart:io';
 
 import '../common/coomoonPath.dart';
@@ -81,7 +82,7 @@ class _addServicesState extends State<addServices> with SingleTickerProviderStat
   //     _tabController.index = 1;
   //   });
   // }
-
+final _addtherapiest = Get.put(allfunc());
 
   @override
   Widget build(BuildContext context) {
@@ -502,34 +503,7 @@ class _addServicesState extends State<addServices> with SingleTickerProviderStat
                                          InkWell(
                                            onTap: () async {
 
-                                             try{
-                                               print("data adding in progress");
-                                               FirebaseStorage storage = FirebaseStorage.instance;
-                                               Reference ref = storage.ref().child("${_auth.currentUser!.email.toString()}spa").child("images/${spaName.toString()}").child(_therapiest_name.text);
-                                               UploadTask uploadTask = ref.putFile(profile_photo!);
-                                               await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
-                                               String imageURL = await ref.getDownloadURL();
-                                               print('Download URL: $imageURL');
-                                               print("photo uploaded");
-
-
-                                               QuerySnapshot snap =  await snapcom.doc(spaId.toString()).collection('therapiest').get();
-                                               int count = snap.docs.length;
-                                               snapcom.doc(spaId.toString()).collection('therapiest').doc('${count+1}').set({
-                                                 'id': '${count + 1}',
-                                                 'name':_therapiest_name.text,
-                                                 'title':_therapiest_title.text,
-                                                 'working_days':_therapiest_working_days.text,
-                                                 'working_hours':_therapiest_working_hours.text,
-                                                 'imgURl':imageURL.toString()
-                                               }).then((value) {
-                                                 print("data Added");
-                                                 print(imageURL.toString());
-                                               });
-                                             }on FirebaseAuthException catch(e){
-                                               Fluttertoast.showToast(msg: e.message.toString());
-                                             }
-                                             Get.back();
+                                               _addtherapiest.addtherapiest(_therapiest_name.text, _therapiest_title.text, _therapiest_working_days.text, _therapiest_working_hours.text, spaName.toString(), spaId.toString(), profile_photo!);
 
                                            },
                                            child: Container(
@@ -677,37 +651,15 @@ class _addServicesState extends State<addServices> with SingleTickerProviderStat
 
                       _tabController.animateTo(2);
                     }else{
-                      try{
-
-                        FirebaseStorage storage = FirebaseStorage.instance;
-                        Reference ref = storage.ref().child("${_auth.currentUser!.email.toString()}spa").child("images/${spaName.toString()}").child(_therapiest_name.text);
-                        UploadTask uploadTask = ref.putFile(_service_photo!);
-                        await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
-                        String serviceImageURL = await ref.getDownloadURL();
-                        // print('Download URL: $imageURL');
-                        print("photo uploaded");
-
-
-                        snapcom.doc(spaId.toString()).collection('services').add({
-                          'service_name':_add_services.text,
-                          'service_description':_description.text,
-                          'service_price':_add_price.text,
-                          'service_img':_service_photo.toString(),
-                          'selected_terapiest':_selectedIndex.toString()
-                        }).then((value) {
-                          Get.offAll(VendorHomeScreen());
-                        });
-
-                      }on FirebaseAuthException catch(e){
-                        Fluttertoast.showToast(msg: e.message.toString());
-                      }
-
+                    _addtherapiest.addservices(spaName.toString(), _therapiest_name.text, _service_photo!, spaId.toString(), _add_services.text, _description.text, _add_price.text, _selectedIndex.toString());
 
                     }
                     print(_tabController.index);
                     _selectedIndex.clear();
                   },
                   child: Container(
+
+
                     alignment: Alignment.center,
                     width: w*0.9,
                     height: 50,

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -36,7 +37,7 @@ class _vendorSignUpState extends State<vendorSignUp> {
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
     final h = MediaQuery.of(context).size.height;
-    // List of items in our dropdown menu
+
     return  Scaffold(
       backgroundColor: const Color(0xFF1F4B3E),
       body: Obx(
@@ -265,6 +266,11 @@ class _vendorSignUpState extends State<vendorSignUp> {
                         ),
                       ),
                       SizedBox(height: 35,),
+
+                      _signup.signuploading.value?CupertinoActivityIndicator(
+                        color: Colors.white,
+                        radius: 20,
+                      ) :
                       GestureDetector(
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNav(),));

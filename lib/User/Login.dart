@@ -31,6 +31,8 @@ class _LoginPageState extends State<LoginPage> {
 bool viewpass = true;
 // final loading = false.obs;
 final _login=Get.put(allfunc());
+String? dropdownvalue;
+
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +172,70 @@ final _login=Get.put(allfunc());
                         ),
                         SizedBox(height: h*0.25,),
 
+                        Row(
+                          children: [
+                            Container(width: w*0.04,),
+                            Text('Plsease select your acount type:',style: TextStyle(fontSize: 15,color: Colors.white),),
+                          ],
+                        ),
+                        SizedBox(height: h*0.01,),
+                        //DROPDOWN BUTTON
+                        Container(
+                          width: 380,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10)
+                          ),
+                          child:  Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              DropdownButton(
+                                // Initial Value
+                                value: dropdownvalue,
+                                // Down Arrow Icon
+                                icon: Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: const Icon(Icons.keyboard_arrow_down),
+                                ),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    dropdownvalue = newValue!;
+                                  });
+                                },
+                                underline: Container(),
+                                // Array list of items
+                                isExpanded: true,
+                                hint: Padding(
+                                  padding: const EdgeInsets.only(left: 18.0),
+                                  child: Text("Choose"),
+                                ),
+                                // alignment: Alignment.center,
+
+                                items:const [
+                                  DropdownMenuItem(
+                                    value: 'USER',
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 12.0),
+                                      child: Text("USER",style: TextStyle(fontWeight: FontWeight.w500),),
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'VENDOR',
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 12.0),
+                                      child: Text("VENDOR",style: TextStyle(fontWeight: FontWeight.w500),),
+                                    ),
+                                  ),
+                                ],
+                                // After selecting the desired option, it will
+                                // change button value to selected value
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: h*0.03,),
+
                         //EMAIL TEXTFORM FIELD
                         Container(
                           width: 380,
@@ -246,7 +312,7 @@ final _login=Get.put(allfunc());
                             ],
                           ),
                         ),
-                        SizedBox(height: h*0.1,),
+                        SizedBox(height: h*0.03,),
 
                         //LOGIN BOTTOM
 
@@ -257,7 +323,7 @@ final _login=Get.put(allfunc());
 
                         GestureDetector(
                           onTap: () async {
-                            _login.loginfunc(email.text, pass.text);
+                            _login.loginfunc(email.text, pass.text,dropdownvalue.toString());
                             print(typ);
 
                           },

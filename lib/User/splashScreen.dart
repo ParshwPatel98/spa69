@@ -31,9 +31,9 @@ class _splashScreenState extends State<splashScreen> {
       //
       // getEmailtxt == null || getutype.toString() == "VENDOR"? Get.to(vendorspalists()):Get.to(LoginPage());
               if(getutype.toString() == "VENDOR"){
-                getEmailtxt == null || getutype.toString() == "VENDOR"? Get.to(vendorspalists()):Get.to(LoginPage());
+                getEmailtxt == null || getutype.toString() == "VENDOR"? Get.offAll(vendorspalists()):Get.offAll(LoginPage());
               }else{
-                getEmailtxt == null || getEmailtxt.toString() == ""? Get.to(LoginPage()):Get.to(BottomNav());
+                getEmailtxt == null || getEmailtxt.toString() == ""? Get.offAll(LoginPage()):Get.offAll(BottomNav());
               }
 
             }

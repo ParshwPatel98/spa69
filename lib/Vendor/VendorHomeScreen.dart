@@ -13,6 +13,7 @@ import 'package:spa69/Vendor/addServices.dart';
 import 'package:spa69/common/commontxt.dart';
 
 import '../common/coomoonPath.dart';
+import '../commonFunction/allcommfunc.dart';
 class VendorHomeScreen extends StatefulWidget {
   const VendorHomeScreen({Key? key}) : super(key: key);
 
@@ -56,6 +57,8 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
     getspaId();
     super.initState();
   }
+  final _addtherapiest = Get.put(allfunc());
+
   @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
@@ -347,31 +350,33 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                       SizedBox(height: h*0.02,),
                                       InkWell(
                                         onTap: () async {
-                                          print("data adding in progress");
-                                          FirebaseStorage storage = FirebaseStorage.instance;
-                                          Reference ref = storage.ref().child("${_auth.currentUser!.email.toString()}spa").child("images/${spaName.toString()}").child(_therapiest_name.text);
-                                          UploadTask uploadTask = ref.putFile(profile_photo!);
-                                          await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
-                                          String imageURL = await ref.getDownloadURL();
-                                          print('Download URL: $imageURL');
-                                          print("photo uploaded");
+                                          // print("data adding in progress");
+                                          // FirebaseStorage storage = FirebaseStorage.instance;
+                                          // Reference ref = storage.ref().child("${_auth.currentUser!.email.toString()}spa").child("images/${spaName.toString()}").child(_therapiest_name.text);
+                                          // UploadTask uploadTask = ref.putFile(profile_photo!);
+                                          // await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
+                                          // String imageURL = await ref.getDownloadURL();
+                                          // print('Download URL: $imageURL');
+                                          // print("photo uploaded");
+                                          //
+                                          //
+                                          // QuerySnapshot snap =  await snapcom.doc(spaId.toString()).collection('therapiest').get();
+                                          // int count = snap.docs.length;
+                                          // snapcom.doc(spaId.toString()).collection('therapiest').doc('${count+1}').set({
+                                          //   'id':'${count + 1}',
+                                          //   'name':_therapiest_name.text,
+                                          //   'title':_therapiest_title.text,
+                                          //   'working_days':_therapiest_working_days.text,
+                                          //   'working_hours':_therapiest_working_hours.text,
+                                          //   'imgURl':imageURL.toString()
+                                          // }).then((value) {
+                                          //   print("data Added");
+                                          //   print(imageURL.toString());
+                                          // });
+                                          //
+                                          // Get.back();
 
-
-                                          QuerySnapshot snap =  await snapcom.doc(spaId.toString()).collection('therapiest').get();
-                                          int count = snap.docs.length;
-                                          snapcom.doc(spaId.toString()).collection('therapiest').doc('${count+1}').set({
-                                            'id':'${count + 1}',
-                                            'name':_therapiest_name.text,
-                                            'title':_therapiest_title.text,
-                                            'working_days':_therapiest_working_days.text,
-                                            'working_hours':_therapiest_working_hours.text,
-                                            'imgURl':imageURL.toString()
-                                          }).then((value) {
-                                            print("data Added");
-                                            print(imageURL.toString());
-                                          });
-
-                                          Get.back();
+                                          _addtherapiest.addtherapiest(_therapiest_name.text, _therapiest_title.text, _therapiest_working_days.text, _therapiest_working_hours.text, spaName.toString(), spaId.toString(), profile_photo!);
 
                                         },
                                         child: Container(

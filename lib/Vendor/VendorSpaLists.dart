@@ -36,7 +36,20 @@ class _vendorspalistsState extends State<vendorspalists> {
   // final loading = false.obs;
   final snapcomm= FirebaseFirestore.instance.collection("SPAS").doc(FirebaseAuth.instance.currentUser!.email.toString()).collection('spa');
   final _addSpa = Get.put(allfunc());
+  String? utype;
 
+  getutype() async{
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    setState(() {
+      utype = sf.getString("utype");
+    });
+  }
+@override
+  void initState() {
+    // TODO: implement initState
+  getutype();
+    super.initState();
+  }
 
 
   @override
@@ -261,7 +274,7 @@ class _vendorspalistsState extends State<vendorspalists> {
                                                   //   Fluttertoast.showToast(msg: e.message.toString());
                                                   //   loading(false);
                                                   // }finally{
-                                                  _addSpa.addspa(spaName.text, location.text, dropdownvalue.toString(), profile_photo!);
+                                                  _addSpa.addspa(spaName.text, location.text, dropdownvalue.toString(), profile_photo!,auth.currentUser!.email.toString(),utype.toString());
 
                                                 },
 
