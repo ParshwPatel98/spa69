@@ -127,16 +127,16 @@ class allfunc extends GetxController{
     }
   }
 
-  addspa(spaName,location,dropdownvalue,File profile_photo,email,utype) async {
+  addspa(spaName,location,dropdownvalue,File spa_photo,email,utype) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     try{
       addspaloading(true);
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference ref = storage.ref().child("${auth.currentUser!.email.toString()}spa").child("images/${spaName}");
-      UploadTask uploadTask = ref.putFile(profile_photo);
+      UploadTask uploadTask = ref.putFile(spa_photo);
       await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
-      String imageURL = await ref.getDownloadURL();
-      print('Download URL: $imageURL');
+      String spaURL = await ref.getDownloadURL();
+      print('Download URL: $spaURL');
 
       // QuerySnapshot snap =  await snapcom.get();
       // int count = snap.docs.length;
@@ -151,12 +151,12 @@ class allfunc extends GetxController{
       // });
       QuerySnapshot snap = await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").get();
       int count = snap.docs.length;
-      await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc().set({
-        'id':"${count+1}",
+      await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc("${email}${count+1}").set({
+        'id':"${email}${count+1}",
         "spaName":spaName,
         "location":location,
         "available":dropdownvalue,
-        "imgURL":imageURL.toString(),
+        "imgURL":spaURL.toString(),
       }).then((value) {
         Get.back();
       });
@@ -170,41 +170,55 @@ class allfunc extends GetxController{
 
 
   }
-
-  addtherapiest (_therapiest_name,_therapiest_title,_therapiest_working_days,_therapiest_working_hours,spaName,spaId,File profile_photo) async {
+  addtherapiest (utype,email,_therapiest_name,_therapiest_title,_therapiest_working_days,_therapiest_working_hours,spaName,spaId,File therapist_photo) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
 
     try{
       print("data adding in progress");
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference ref = storage.ref().child("${auth.currentUser!.email.toString()}spa").child("images/${spaName}").child(_therapiest_name);
-      UploadTask uploadTask = ref.putFile(profile_photo);
+      UploadTask uploadTask = ref.putFile(therapist_photo);
       await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
-      String imageURL = await ref.getDownloadURL();
-      print('Download URL: $imageURL');
+      String therapistURL = await ref.getDownloadURL();
+      print('Download URL: $therapistURL');
       print("photo uploaded");
 
-
-      QuerySnapshot snap =  await snapcom.doc(spaId.toString()).collection('therapiest').get();
+      QuerySnapshot snap = await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").get();
       int count = snap.docs.length;
-      snapcom.doc(spaId.toString()).collection('therapiest').doc('${count+1}').set({
-        'id': '${count + 1}',
-        'name':_therapiest_name,
-        'title':_therapiest_title,
-        'working_days':_therapiest_working_days,
-        'working_hours':_therapiest_working_hours,
-        'imgURl':imageURL.toString()
+      QuerySnapshot snapadd = await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc("${email}${count}").collection('therapiest').get();
+      int countadd = snapadd.docs.length;
+      FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc("${email}${count}").collection('therapiest').doc('${countadd+1}').set({
+                  'id': '${countadd + 1}',
+                  'name':_therapiest_name,
+                  'title':_therapiest_title,
+                  'working_days':_therapiest_working_days,
+                  'working_hours':_therapiest_working_hours,
+                  'imgURl':therapistURL.toString(),
       }).then((value) {
-        print("data Added");
-        print(imageURL.toString());
         Get.back();
       });
+
+      // QuerySnapshot snap =  await snapcom.doc(spaId.toString()).collection('therapiest').get();
+      // int count = snap.docs.length;
+      // snapcom.doc(spaId.toString()).collection('therapiest').doc('${count+1}').set({
+      //   'id': '${count + 1}',
+      //   'name':_therapiest_name,
+      //   'title':_therapiest_title,
+      //   'working_days':_therapiest_working_days,
+      //   'working_hours':_therapiest_working_hours,
+      // //   'imgURl':imageURL.toString()
+      // }).then((value) {
+      //   print("data Added");
+      //   print(imageURL.toString());
+      //   Get.back();
+      // });
     }on FirebaseAuthException catch(e){
       Fluttertoast.showToast(msg: e.message.toString());
     }
+
   }
 
-  addservices(spaName,_therapiest_name,File _service_photo,spaId,_add_services,_description,_add_price,_selectedIndex) async {
+  addservices(utype,email,spaName,_therapiest_name,File _service_photo,spaId,_add_services,_description,_add_price,_selectedIndex) async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     try{
 
@@ -217,21 +231,84 @@ class allfunc extends GetxController{
         print("photo uploaded");
 
 
-        snapcom.doc(spaId).collection('services').add({
+        // QuerySnapshot snap = await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").get();
+        // int count = snap.docs.length;
+        QuerySnapshot snapadd = await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc("${spaId}").collection('therapiest').get();
+        int countadd = snapadd.docs.length;
+        FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc("${spaId}").collection('services').doc().set({
+
           'service_name':_add_services,
           'service_description':_description,
           'service_price':_add_price,
           'service_img':serviceImageURL,
-          'selected_terapiest':_selectedIndex
+          'selected_terapiest':_selectedIndex,
         }).then((value) {
-          Get.offAll(VendorHomeScreen());
+          Get.back();
         });
+
+        //
+        // snapcom.doc(spaId).collection('services').add({
+        //   'service_name':_add_services,
+        //   'service_description':_description,
+        //   'service_price':_add_price,
+        //   'service_img':serviceImageURL,
+        //   'selected_terapiest':_selectedIndex
+        // }).then((value) {
+        //   Get.offAll(VendorHomeScreen());
+        // });
 
       }on FirebaseAuthException catch(e){
         Fluttertoast.showToast(msg: e.message.toString());
       }
 
     }
+
+  updatetherapist(spaId,spaName,_therapiest_name,utype,email,_updated_name,_updated_title,_updated_days,_updateed_hours,File _updated_therapist_photo) async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    try{
+      print("data adding in progress");
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference ref = storage.ref().child("${auth.currentUser!.email.toString()}spa").child("images/${spaName}").child(_updated_name);
+      UploadTask uploadTask = ref.putFile(_updated_therapist_photo);
+      await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
+      String therapistURL = await ref.getDownloadURL();
+      print('Download URL: $therapistURL');
+      print("photo uploaded");
+
+      QuerySnapshot snap = await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").get();
+      int count = snap.docs.length;
+      QuerySnapshot snapadd = await FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc("${email}${count}").collection('therapiest').get();
+      int countadd = snapadd.docs.length;
+      FirebaseFirestore.instance.collection(utype).doc(email).collection("Spas").doc("${email}${count}").collection('therapiest').doc('${countadd+1}').set({
+        'id': '${countadd + 1}',
+        'name':_updated_name,
+        'title':_updated_title,
+        'working_days':_updated_days,
+        'working_hours':_updateed_hours,
+        'imgURl':therapistURL.toString(),
+      }).then((value) {
+        Get.back();
+      });
+
+      // QuerySnapshot snap =  await snapcom.doc(spaId.toString()).collection('therapiest').get();
+      // int count = snap.docs.length;
+      // snapcom.doc(spaId.toString()).collection('therapiest').doc('${count+1}').set({
+      //   'id': '${count + 1}',
+      //   'name':_therapiest_name,
+      //   'title':_therapiest_title,
+      //   'working_days':_therapiest_working_days,
+      //   'working_hours':_therapiest_working_hours,
+      // //   'imgURl':imageURL.toString()
+      // }).then((value) {
+      //   print("data Added");
+      //   print(imageURL.toString());
+      //   Get.back();
+      // });
+    }on FirebaseAuthException catch(e){
+      Fluttertoast.showToast(msg: e.message.toString());
+    }
+
+  }
 
 
 

@@ -30,6 +30,8 @@ class _LoginPageState extends State<LoginPage> {
  String? typ;
 bool viewpass = true;
 // final loading = false.obs;
+
+
 final _login=Get.put(allfunc());
 String? dropdownvalue;
 

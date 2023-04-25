@@ -28,12 +28,19 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
   FirebaseFirestore _fstore = FirebaseFirestore.instance;
   FirebaseAuth _auth = FirebaseAuth.instance;
   String? spaName;
-  String? spaId;
+  String?
+  spaId;
   File? profile_photo;
   TextEditingController _therapiest_name = TextEditingController();
   TextEditingController _therapiest_title = TextEditingController();
   TextEditingController _therapiest_working_days = TextEditingController();
   TextEditingController _therapiest_working_hours = TextEditingController();
+  TextEditingController _edit_name = TextEditingController();
+  TextEditingController _edit_title = TextEditingController();
+  TextEditingController _edit_hours = TextEditingController();
+  TextEditingController _edit_days = TextEditingController();
+  String? utype;
+
 
   getspaName() async {
     SharedPreferences sf = await SharedPreferences.getInstance();
@@ -50,11 +57,19 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
     });
   }
 
+  getutype() async {
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    setState(() {
+      utype = sf.getString("utype");
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     getspaName();
     getspaId();
+    getutype();
     super.initState();
   }
   final _addtherapiest = Get.put(allfunc());
@@ -126,6 +141,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                           onTap: () {
                             print(spaName.toString());
                             print(spaId);
+                            print(utype);
                           },
                           child: Container(
                             width: w*0.9,
@@ -220,7 +236,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                                       border: Border.all(color: green,width: 2),
                                                       shape: BoxShape.circle
                                                   ),
-                                                  // child: Image.asset("assets/images/ahmedabad.png",fit: BoxFit.fill,),
+
                                                 ),
                                               ),
                                               Positioned(
@@ -265,8 +281,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                             // focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                                             border: InputBorder.none,
                                           ),
-                                          // maxLines: 4,
-                                          // maxLength: 6,
+
                                         ),
                                       ),
                                       SizedBox(height: h*0.05,),
@@ -293,8 +308,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                             // focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                                             border: InputBorder.none,
                                           ),
-                                          // maxLines: 4,
-                                          // maxLength: 6,
+
                                         ),
                                       ),
                                       SizedBox(height: h*0.02,),
@@ -350,34 +364,20 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                       SizedBox(height: h*0.02,),
                                       InkWell(
                                         onTap: () async {
-                                          // print("data adding in progress");
-                                          // FirebaseStorage storage = FirebaseStorage.instance;
-                                          // Reference ref = storage.ref().child("${_auth.currentUser!.email.toString()}spa").child("images/${spaName.toString()}").child(_therapiest_name.text);
-                                          // UploadTask uploadTask = ref.putFile(profile_photo!);
-                                          // await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
-                                          // String imageURL = await ref.getDownloadURL();
-                                          // print('Download URL: $imageURL');
-                                          // print("photo uploaded");
-                                          //
-                                          //
-                                          // QuerySnapshot snap =  await snapcom.doc(spaId.toString()).collection('therapiest').get();
-                                          // int count = snap.docs.length;
-                                          // snapcom.doc(spaId.toString()).collection('therapiest').doc('${count+1}').set({
-                                          //   'id':'${count + 1}',
-                                          //   'name':_therapiest_name.text,
-                                          //   'title':_therapiest_title.text,
-                                          //   'working_days':_therapiest_working_days.text,
-                                          //   'working_hours':_therapiest_working_hours.text,
-                                          //   'imgURl':imageURL.toString()
-                                          // }).then((value) {
-                                          //   print("data Added");
-                                          //   print(imageURL.toString());
-                                          // });
-                                          //
-                                          // Get.back();
 
-                                          _addtherapiest.addtherapiest(_therapiest_name.text, _therapiest_title.text, _therapiest_working_days.text, _therapiest_working_hours.text, spaName.toString(), spaId.toString(), profile_photo!);
 
+                                          _addtherapiest.addtherapiest(
+                                              utype.toString(),
+                                              _auth.currentUser!.email.toString(),
+                                              _therapiest_name.text,
+                                              _therapiest_title.text,
+                                              _therapiest_working_days.text,
+                                              _therapiest_working_hours.text,
+                                              spaName.toString(),
+                                              spaId.toString(),
+
+                                              profile_photo!
+                                          );
                                         },
                                         child: Container(
                                           alignment: Alignment.center,
@@ -423,7 +423,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                   SizedBox(height: h*0.02,),
                   Expanded(
                     child: StreamBuilder(
-                      stream: _fstore.collection('SPAS').doc(_auth.currentUser!.email.toString()).collection("spa").doc(spaId).collection('therapiest').snapshots(),
+                      stream: _fstore.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc("${spaId.toString()}").collection('therapiest').snapshots(),
                       builder: (context, snapshot) {
                         if(snapshot.connectionState==ConnectionState.waiting){
                           return Center(child: CircularProgressIndicator(),);
@@ -440,7 +440,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                               itemBuilder: (BuildContext context, int index) {
                                 return Container(
                                   width: w,
-                                  height: h*0.22,
+                                  height: h*0.25,
                                   decoration: BoxDecoration(
                                       color: green,
                                       borderRadius: BorderRadius.circular(15)
@@ -448,13 +448,19 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                   child: Column(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 8.0),
+                                        padding: const EdgeInsets.only(right: 8.0,top: 10),
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
-                                            Icon(Icons.mode_edit_outline_outlined,color: golden,size: 26,),
-                                            SizedBox(width: 10,),
-                                            Icon(Icons.delete,color: golden,size: 26,)
+                                            GestureDetector(
+                                                onTap: () async {
+
+                                                  FirebaseFirestore.instance.collection('VENDOR').doc(_auth.currentUser!.email.toString()).collection("Spas").doc("${spaId}").collection("therapiest").doc(
+                                                    snapshot.data!.docs[index].id.toString()
+                                                  ).delete();
+
+                                                },
+                                                child: Icon(Icons.delete,color: golden,size: 26,))
                                           ],
                                         ),
                                       ),
@@ -470,9 +476,9 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                                   shape: BoxShape.circle,
                                                   border: Border.all(color: golden,width: 2)
                                               ),
-                                              child: Image.asset("assets/images/goa.png"),
+                                              child: Image.network(snapshot.data!.docs[index].get('imgURl'),),
                                             ),
-                                            SizedBox(width: 10,),
+                                            SizedBox(width: 7,),
                                             Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
@@ -483,16 +489,16 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                           ],
                                         ),
                                       ),
-                                      SizedBox(height: 3,),
+                                      SizedBox(height: 5,),
                                       Padding(
-                                        padding: const EdgeInsets.only(left: 8.0),
+                                        padding: const EdgeInsets.only(left: 20.0),
                                         child: Row(
                                           children: [
-                                            Text("Working Hours",style: TextStyle(fontSize: 15,color: Colors.white),)
+                                            Text("Working Hours:",style: TextStyle(fontSize: 15,color: Colors.white),)
                                           ],
                                         ),
                                       ),
-                                      SizedBox(height: 3,),
+                                      SizedBox(height: 8,),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
@@ -600,79 +606,200 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                       width: w*0.9,
                       height: h*0.6,
                       // color: Colors.black,
-                      child: ListView.separated(
-                        itemCount: 4,
-                        itemBuilder: (BuildContext context, int index) {
-                        return Container(
-                          width: w*0.9,
-                          height: h*0.28,
-                          color: Colors.transparent,
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: w*0.1,
-                                    height: h*0.05,
-                                    color: Colors.transparent,
-                                    child: SvgPicture.asset("assets/svgimages/greenbottles.svg")
-                                  ),
-                                  Text("Full Body Massage",style: TextStyle(fontSize: 20,color: golden,fontWeight: FontWeight.w500),)
-                                ],
-                              ),
-                              SizedBox(height: h*0.02),
-                              Row(
-                                children: [
-                                  Container(
+                      child: StreamBuilder(
+                        stream:_fstore.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc("${spaId.toString()}").collection('services').snapshots() ,
+                        builder: (context, snapshot) {
+                          if(snapshot.connectionState==ConnectionState.waiting){
+                          return Center(child: CircularProgressIndicator(),);
+                          }
+                          else if(snapshot.data!.docs.isEmpty){
+                          return Center(child: Text("No Spa FOund"),);
+                          }
+                          else{
+                            return ListView.separated(
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () async {
+                                    List therapistname=[];
+                                    therapistname.clear();
+
+
+                                    QuerySnapshot snapserv=await FirebaseFirestore.instance.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc("${spaId.toString()}").collection('services').get();
+                                    for(int i=0;i<snapserv.docs[index]["selected_terapiest"].length;i++){
+                                      await _fstore.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc("${spaId.toString()}").collection('therapiest').doc(snapserv.docs[index]["selected_terapiest"][i])
+                                          .get().then((DocumentSnapshot) {
+                                        setState(() {
+                                          therapistname.add(DocumentSnapshot.get("name").toString());
+                                        });
+
+                                        print(DocumentSnapshot.get("name").toString());
+                                      }
+                                      );
+                                    }
+                                    showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(15),
+                                              topRight: Radius.circular(15)
+                                          )),
+                                      context: context,
+                                      builder: (context) {
+                                        if(snapshot.connectionState==ConnectionState.waiting){
+                                          return Center(child: CircularProgressIndicator(),);
+                                        }
+                                        else if(snapshot.data!.docs.isEmpty){
+                                          return Center(child: Text("No Spa FOund"),);
+                                        }
+                                        else{
+                                          return Container(
+                                            height: h*0.35,
+                                            child: Column(
+                                              // crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(height: h*0.02,),
+                                                Container(
+                                                  width: w*0.9,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      border: Border.all(color: golden)
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      Text('Service Name:',style: TextStyle(fontSize: 22),),
+                                                      Text(snapshot.data!.docs[index].get('service_name'),style: TextStyle(fontSize: 25),),
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(height: h*0.02,),
+                                                Container(
+                                                  width: w*0.9,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      border: Border.all(color: golden)
+                                                  ),
+                                                  child: Row(
+                                                    // crossAxisAlignment: CrossAxisAlignment.center,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      Text('Service description:',style: TextStyle(fontSize: 22),),
+                                                      Text(snapshot.data!.docs[index].get('service_description'),style: TextStyle(fontSize: 22),),
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(height: h*0.02,),
+                                                Container(
+                                                  width: w*0.9,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      border: Border.all(color: golden)
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      Text('Service price:',style: TextStyle(fontSize: 22),),
+                                                      Text("₹${snapshot.data!.docs[index].get('service_price')}",style: TextStyle(fontSize: 25),),
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(height: h*0.02,),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                  children: [
+                                                    Text('Therapist:',style: TextStyle(fontSize: 22),),
+                                                    Text(therapistname.toString().replaceAll("[", "").replaceAll("]", ""),style: TextStyle(fontSize: 25),),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      },);
+                                  },
+                                  child: Container(
                                     width: w*0.9,
-                                    height: h*0.2,
-                                    color: Colors.white,
-                                    child: Row(
+                                    height: h*0.28,
+                                    color: Colors.transparent,
+                                    child: Column(
                                       children: [
-                                        Container(
-                                          width: w*0.5,
-                                          height: h*0.2,
-                                          color: Colors.transparent,
-                                          child: Image.asset("assets/images/spaimg.png",fit: BoxFit.fill,),
+                                        Row(
+                                          children: [
+                                            Container(
+                                                width: w*0.1,
+                                                height: h*0.05,
+                                                color: Colors.transparent,
+                                                child: SvgPicture.asset("assets/svgimages/greenbottles.svg")
+                                            ),
+                                            Text(snapshot.data!.docs[index].get('service_name'),style: TextStyle(fontSize: 20,color: golden,fontWeight: FontWeight.w500),)
+                                          ],
                                         ),
-                                        Container(
-                                          width: w*0.4,
-                                          height: h*0.2,
-                                          color: green,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Column(
+                                        SizedBox(height: h*0.02),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: w*0.9,
+                                              height: h*0.2,
+                                              color: Colors.white,
+                                              child: Row(
                                                 children: [
-                                                  Image.asset("assets/images/heaart.png"),
-                                                  SizedBox(height: 5,),
-                                                  Text("60 Min",style: TextStyle(fontSize: 15,color: Colors.white),),
-                                                  SizedBox(height: 5,),
-                                                  Text("\$40/Hours",style: TextStyle(fontSize: 15,color: Colors.white),),
+                                                  Container(
+                                                    width: w*0.5,
+                                                    height: h*0.2,
+                                                    color: Colors.transparent,
+                                                    child: Image.network(snapshot.data!.docs[index].get('service_img'),fit: BoxFit.fill,),
+                                                  ),
+                                                  Container(
+                                                    width: w*0.4,
+                                                    height: h*0.2,
+                                                    color: green,
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [
+                                                        Column(
+                                                          children: [
+                                                            Image.asset("assets/images/heaart.png"),
+                                                            SizedBox(height: 5,),
+                                                            Text("60 Min",style: TextStyle(fontSize: 15,color: Colors.white),),
+                                                            SizedBox(height: 5,),
+                                                            Text("₹${snapshot.data!.docs[index].get('service_price')}/Hour",style: TextStyle(fontSize: 15,color: Colors.white),),
+                                                            // Text("Hours",style: TextStyle(fontSize: 15,color: Colors.white),),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                          children: [
+                                                            GestureDetector(
+                                                                onTap: (){
+                                                                  FirebaseFirestore.instance.collection('VENDOR').doc(_auth.currentUser!.email.toString()).collection("Spas").doc("${spaId}").collection("services").doc(
+                                                                      snapshot.data!.docs[index].id.toString()
+                                                                  ).delete();
+
+                                                                },
+                                                                child: Icon(Icons.delete,color: golden,size: 30,)),
+                                                          ],
+                                                        ),
+
+                                                      ],
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                children: [
-
-                                                  Icon(Icons.delete,color: golden,size: 30,),
-                                                ],
-                                              ),
-
-                                            ],
-                                          ),
-                                        ),
+                                            )
+                                          ],
+                                        )
                                       ],
                                     ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        );
-                      }, separatorBuilder: (BuildContext context, int index) {
-                          return SizedBox(height: 10,);
-                      },),
+                                  ),
+                                );
+                              }, separatorBuilder: (BuildContext context, int index) {
+                              return SizedBox(height: 10,);
+                            },);
+                          }
+
+                        }
+                      ),
                     ),
                   ),
                   Padding(

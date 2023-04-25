@@ -37,14 +37,26 @@ class _addServicesState extends State<addServices> with SingleTickerProviderStat
   // List<String> _thearapiest_list = [];
   String? selectedValue;
   String? spaName;
-  File? profile_photo;
+  File? therapist_photo;
   File? _service_photo;
   List _selectedIndex=[];
   // late TabController _tabController;
   late TabController _tabController;
   String? spaId;
+  String? utype;
 
 
+
+  @override
+  void initState() {
+    super.initState();
+    // _goToSecondTab();
+    getSpaName();
+    getspaId();
+    getutype();
+
+    _tabController = TabController(vsync: this, length: 3);
+  }
 
   getSpaName() async {
     SharedPreferences sf = await SharedPreferences.getInstance();
@@ -54,20 +66,22 @@ class _addServicesState extends State<addServices> with SingleTickerProviderStat
 
   }
   getspaId() async {
-    SharedPreferences sf = await SharedPreferences.getInstance();
+    SharedPreferences spaIdSf = await SharedPreferences.getInstance();
     setState(() {
-      spaId = sf.getString('spaId');
+      spaId = spaIdSf.getString('spaId');
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // _goToSecondTab();
-    getSpaName();
-    getspaId();
-    _tabController = TabController(vsync: this, length: 3);
+  getutype() async{
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    setState(() {
+      utype = sf.getString("utype");
+    });
   }
+
+
+
+
 
   @override
   void dispose() {
@@ -357,7 +371,7 @@ final _addtherapiest = Get.put(allfunc());
                                                        XFile? xf = await ImagePicker().pickImage(source: ImageSource.gallery);
                                                        if (xf != null) {
                                                          setState(() {
-                                                           profile_photo=File(xf.path);
+                                                           therapist_photo=File(xf.path);
                                                          });
                                                        }
                                                      }
@@ -367,7 +381,7 @@ final _addtherapiest = Get.put(allfunc());
                                                      width: w*0.3,
                                                      height: h*0.15,
                                                      decoration: BoxDecoration(
-                                                         image: DecorationImage(fit: BoxFit.fill,image: profile_photo!= null ? FileImage(profile_photo!):AssetImage("assets/images/ahmedabad.png",) as ImageProvider),
+                                                         image: DecorationImage(fit: BoxFit.fill,image: therapist_photo!= null ? FileImage(therapist_photo!):AssetImage("assets/images/ahmedabad.png",) as ImageProvider),
                                                          color: Colors.white,
                                                          border: Border.all(color: green,width: 2),
                                                          shape: BoxShape.circle
@@ -503,8 +517,19 @@ final _addtherapiest = Get.put(allfunc());
                                          InkWell(
                                            onTap: () async {
 
-                                               _addtherapiest.addtherapiest(_therapiest_name.text, _therapiest_title.text, _therapiest_working_days.text, _therapiest_working_hours.text, spaName.toString(), spaId.toString(), profile_photo!);
-
+                                               // _addtherapiest.addtherapiest(_therapiest_name.text, _therapiest_title.text, _therapiest_working_days.text, _therapiest_working_hours.text, spaName.toString(), spaId.toString(), profile_photo!);
+                                                      _addtherapiest.addtherapiest(
+                                                          utype.toString(),
+                                                          _auth.currentUser!.email.toString(),
+                                                          _therapiest_name.text,
+                                                          _therapiest_title.text,
+                                                          _therapiest_working_days.text,
+                                                          _therapiest_working_hours.text,
+                                                          spaName.toString(),
+                                                          spaId.toString(),
+                                                          therapist_photo!
+                                                      );
+                                             print(utype);
                                            },
                                            child: Container(
                                              alignment: Alignment.center,
@@ -563,7 +588,7 @@ final _addtherapiest = Get.put(allfunc());
                             // border: Border.all(color: Colors.black)
                           ),
                           child:StreamBuilder(
-                            stream: _fstore.collection('SPAS').doc(_auth.currentUser!.email.toString()).collection("spa").doc(spaId).collection('therapiest').snapshots(),
+                              stream: _fstore.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc("${spaId.toString()}").collection('therapiest').snapshots(),
                             builder: (context,snapshot) {
                               if(snapshot.connectionState==ConnectionState.waiting){
                                 return Center(child: CircularProgressIndicator(),);
@@ -651,8 +676,19 @@ final _addtherapiest = Get.put(allfunc());
 
                       _tabController.animateTo(2);
                     }else{
-                    _addtherapiest.addservices(spaName.toString(), _therapiest_name.text, _service_photo!, spaId.toString(), _add_services.text, _description.text, _add_price.text, _selectedIndex.toString());
-
+                    // _addtherapiest.addservices(spaName.toString(), _therapiest_name.text, _service_photo!, spaId.toString(), _add_services.text, _description.text, _add_price.text, _selectedIndex.toString());
+                      -_addtherapiest.addservices(utype.toString(),
+                          _auth.currentUser!.email.toString(),
+                          spaName.toString(),
+                          _therapiest_name.text,
+                          _service_photo!,
+                          spaId.toString(),
+                          _add_services.text,
+                          _description.text,
+                          _add_price.text,
+                          _selectedIndex
+                      );
+                      print(spaId);
                     }
                     print(_tabController.index);
                     _selectedIndex.clear();

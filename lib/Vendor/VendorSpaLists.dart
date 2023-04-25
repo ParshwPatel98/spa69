@@ -27,7 +27,7 @@ class vendorspalists extends StatefulWidget {
 class _vendorspalistsState extends State<vendorspalists> {
 
   String dropdownvalue = 'OPEN';
-  File? profile_photo;
+  File? spa_photo;
   TextEditingController spaName = TextEditingController();
   TextEditingController location = TextEditingController();
 
@@ -44,6 +44,7 @@ class _vendorspalistsState extends State<vendorspalists> {
       utype = sf.getString("utype");
     });
   }
+  
 @override
   void initState() {
     // TODO: implement initState
@@ -65,6 +66,7 @@ class _vendorspalistsState extends State<vendorspalists> {
         title: GestureDetector(
             onTap: (){
               // _getIMage();
+
             },
             child: Text("Your total Spa")),
         centerTitle: true,
@@ -116,7 +118,7 @@ class _vendorspalistsState extends State<vendorspalists> {
                                               XFile? xf = await ImagePicker().pickImage(source: ImageSource.gallery);
                                               if (xf != null) {
                                                 setState(() {
-                                                  profile_photo=File(xf.path);
+                                                  spa_photo=File(xf.path);
                                                 });
                                               }
                                             }
@@ -128,7 +130,7 @@ class _vendorspalistsState extends State<vendorspalists> {
                                                 width: 80,
                                                 height: 80,
                                                 decoration: BoxDecoration(
-                                                    image: DecorationImage(fit: BoxFit.fill,image: profile_photo!= null ? FileImage(profile_photo!):AssetImage("assets/images/ahmedabad.png",) as ImageProvider),
+                                                    image: DecorationImage(fit: BoxFit.fill,image: spa_photo!= null ? FileImage(spa_photo!):AssetImage("assets/images/ahmedabad.png",) as ImageProvider),
                                                     shape: BoxShape.circle,
                                                     color: Colors.white,
                                                     border: Border.all(color: golden)
@@ -274,7 +276,7 @@ class _vendorspalistsState extends State<vendorspalists> {
                                                   //   Fluttertoast.showToast(msg: e.message.toString());
                                                   //   loading(false);
                                                   // }finally{
-                                                  _addSpa.addspa(spaName.text, location.text, dropdownvalue.toString(), profile_photo!,auth.currentUser!.email.toString(),utype.toString());
+                                                  _addSpa.addspa(spaName.text, location.text, dropdownvalue.toString(), spa_photo!,auth.currentUser!.email.toString(),utype.toString());
 
                                                 },
 
@@ -324,7 +326,7 @@ class _vendorspalistsState extends State<vendorspalists> {
             ),
             SizedBox(height: h*0.03,),
             StreamBuilder(
-              stream: snapcomm.snapshots(),
+              stream: FirebaseFirestore.instance.collection(utype.toString()).doc(FirebaseAuth.instance.currentUser!.email.toString()).collection('Spas').snapshots(),
               builder: (context, snapshot) {
                 if(snapshot.connectionState==ConnectionState.waiting){
                   return Center(child: CircularProgressIndicator(),);
@@ -348,11 +350,12 @@ class _vendorspalistsState extends State<vendorspalists> {
                         return GestureDetector(
                           onTap: () async {
                             SharedPreferences sf = await SharedPreferences.getInstance();
-                            sf.setString("spaName",snapshot.data!.docs[index].get("spaname") );
+                            sf.setString("spaName",snapshot.data!.docs[index].get("spaName") );
 
                             SharedPreferences spaIdSf = await SharedPreferences.getInstance();
                             spaIdSf.setString('spaId', snapshot.data!.docs[index].get("id").toString());
-                            print('spaid');
+
+
                             // print(spaId);
 
                             // Fluttertoast.showToast(msg: spaName.text.toString());
@@ -373,13 +376,13 @@ class _vendorspalistsState extends State<vendorspalists> {
                                   width: 80,
                                   height: 80,
                                   decoration: BoxDecoration(
-                                      image: DecorationImage(image: NetworkImage(snapshot.data!.docs[index].get("imgurl")),fit: BoxFit.fill),
+                                      image: DecorationImage(image: NetworkImage(snapshot.data!.docs[index].get("imgURL")),fit: BoxFit.fill),
                                       color: Colors.white,
                                       shape: BoxShape.circle
                                   ),
                                 ),
                                 Text(
-                                    snapshot.data!.docs[index].get("spaname"),
+                                    snapshot.data!.docs[index].get("spaName"),
                                     style: TextStyle(color: Colors.white,fontSize: 15
                                     )),
                                 Text(
