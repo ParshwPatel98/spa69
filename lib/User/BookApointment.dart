@@ -12,11 +12,11 @@ class BookApointment extends StatefulWidget {
 class _BookApointmentState extends State<BookApointment> {
   Color golden = Color(0xFFC18F2C);
   Color green = Color(0xFF1F4B3E) ;
-  List times = ["1:00 AM","2:00 AM","3:00 AM",
-    "4:00 PM","5:00 PM","6:00 PM",
-    "7:00 AM","8:00 AM","9:00 AM",
-    "10:00 PM","11:00 PM","12:00 PM",
-    "13:00 AM","14:00 AM",
+  List times = ["10:00 AM","11:00 AM","12:00 PM",
+    "1:00 PM","2:00 PM","3:00 PM",
+    "4:00 AM","5:00 AM","6:00 AM",
+    "7:00 PM","8:00 PM","9:00 PM",
+    "10:00 AM"
   ];
   // DateTime _selectedDay = DateTime.now();
   late DateTime _selectedDate;
@@ -109,9 +109,10 @@ class _BookApointmentState extends State<BookApointment> {
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                         childAspectRatio: 2.8,
-                        children: List.generate(14, (index) {
+                        children: List.generate(times.length, (index) {
                           return GestureDetector(
                             onTap: () {
+                              print(_selectedDate);
                               setState(() {
                                 _SelectedIndex = index;
                               });

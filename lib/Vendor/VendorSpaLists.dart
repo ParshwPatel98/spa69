@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spa69/User/Login.dart';
 import 'package:spa69/Vendor/VendorHomeScreen.dart';
 import 'package:spa69/common/commontxt.dart';
 import 'package:spa69/commonFunction/allcommfunc.dart';
@@ -29,7 +30,9 @@ class _vendorspalistsState extends State<vendorspalists> {
   String dropdownvalue = 'OPEN';
   File? spa_photo;
   TextEditingController spaName = TextEditingController();
-  TextEditingController location = TextEditingController();
+  TextEditingController apartment_controller = TextEditingController();
+  TextEditingController area_controller = TextEditingController();
+  TextEditingController city_controller = TextEditingController();
 
   final fstore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -62,6 +65,18 @@ class _vendorspalistsState extends State<vendorspalists> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor:green,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+                onTap: () async {
+                  Get.offAll(LoginPage());
+                  SharedPreferences sf = await SharedPreferences.getInstance();
+                  sf.clear();
+                },
+                child: Icon(Icons.logout,color: Colors.white,size: 25,)),
+          )
+        ],
         automaticallyImplyLeading: false,
         title: GestureDetector(
             onTap: (){
@@ -92,7 +107,7 @@ class _vendorspalistsState extends State<vendorspalists> {
                   child: GestureDetector(
                     onTap: (){
                       spaName.clear();
-                      location.clear();
+                      apartment_controller.clear();
                       showModalBottomSheet(
                           isScrollControlled: true,
                           shape: RoundedRectangleBorder(
@@ -108,195 +123,215 @@ class _vendorspalistsState extends State<vendorspalists> {
                                     padding:  EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                                     width: w*0.9,
                                     color: Colors.white,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(height: h*0.04,),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Future<void> profile_image() async {
-                                              XFile? xf = await ImagePicker().pickImage(source: ImageSource.gallery);
-                                              if (xf != null) {
-                                                setState(() {
-                                                  spa_photo=File(xf.path);
-                                                });
+                                    child: SingleChildScrollView(
+
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(height: h*0.04,),
+                                          GestureDetector(
+                                            onTap: () {
+                                              Future<void> profile_image() async {
+                                                XFile? xf = await ImagePicker().pickImage(source: ImageSource.gallery);
+                                                if (xf != null) {
+                                                  setState(() {
+                                                    spa_photo=File(xf.path);
+                                                  });
+                                                }
                                               }
-                                            }
-                                            profile_image();
-                                          },
-                                          child: Stack(
-                                            children: [
-                                              Container(
-                                                width: 80,
-                                                height: 80,
-                                                decoration: BoxDecoration(
-                                                    image: DecorationImage(fit: BoxFit.fill,image: spa_photo!= null ? FileImage(spa_photo!):AssetImage("assets/images/ahmedabad.png",) as ImageProvider),
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white,
-                                                    border: Border.all(color: golden)
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 45,
-                                                top: 59,
-                                                child: Container(
-                                                  width: 25,
-                                                  height: 25,
-                                                  color: Colors.white,
-                                                  child: Icon(Icons.camera_alt_outlined,color: golden,),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: h*0.05,),
-                                        Container(
-                                          width: w*0.9,
-                                          height: h*0.055,
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(10),
-                                              border: Border.all(color: golden)
-                                          ),
-                                          child: TextFormField(
-                                            controller: spaName,
-                                            autofocus: false,
-                                            cursorColor: Colors.black,
-                                            decoration: InputDecoration(
-                                              hintText: "Enter Spa Name",
-                                              prefixIcon: Icon(Icons.drive_file_rename_outline,),
-                                              prefixIconColor: Colors.black54,
-                                              border: InputBorder.none,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: h*0.02,),
-
-                                        Container(
-                                          width: w*0.9,
-                                          height: h*0.055,
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(10),
-                                              border: Border.all(color: golden)
-                                          ),
-                                          child: TextFormField(
-                                            controller: location,
-                                            autofocus: false,
-                                            cursorColor: Colors.black,
-                                            decoration: InputDecoration(
-                                              hintText: "Location",
-                                              prefixIcon: Icon(Icons.location_on_outlined,),
-                                              prefixIconColor: Colors.black54,
-                                              border: InputBorder.none,
-
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: h*0.02,),
-                                        Container(
-                                          width: w*0.9,
-                                          decoration: BoxDecoration(
-                                              border: Border.all(color: golden),
-                                              borderRadius: BorderRadius.circular(15)
-                                          ),
-                                          child: DropdownButton(
-                                            // Initial Value
-                                            value: dropdownvalue,
-                                            // Down Arrow Icon
-                                            icon: Padding(
-                                              padding: const EdgeInsets.only(right: 12.0),
-                                              child: const Icon(Icons.keyboard_arrow_down),
-                                            ),
-                                            onChanged: (String? newValue) {
-                                              setState(() {
-                                                dropdownvalue = newValue!;
-                                              });
+                                              profile_image();
                                             },
-                                            underline: Container(),
-                                            // Array list of items
-                                            isExpanded: true,
-                                            hint: Padding(
-                                              padding: const EdgeInsets.only(left: 10.0),
-                                              child: Text("Choose"),
-                                            ),
-                                            // alignment: Alignment.center,
-                                            items: [
-                                              DropdownMenuItem(
-                                                value: 'OPEN',
-                                                child: Padding(
-                                                  padding: EdgeInsets.only(left: 12.0),
-                                                  child: Text("Open",style: TextStyle(fontWeight: FontWeight.w500),),
-                                                ),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'CLOSE',
-                                                child: Padding(
-                                                  padding: EdgeInsets.only(left: 12.0),
-                                                  child: Text("Close",style: TextStyle(fontWeight: FontWeight.w500),),
-                                                ),
-                                              ),
-                                            ],
-                                            // After selecting the desired option, it will
-                                            // change button value to selected value
-                                          ),
-                                        ),
-                                        SizedBox(height: h*0.02,),
-                                        Obx(
-                                          () {
-                                            return Container(
-                                              child: _addSpa.addspaloading.value ? CircularProgressIndicator(color: Colors.black):
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  // QuerySnapshot snap =  await fstore.collection("SPAS").doc(auth.currentUser!.email.toString()).collection('spa').get();
-                                                  // int count = snap.docs.length;
-                                                  // try{
-                                                  //   loading(true);
-                                                  //
-                                                  //   FirebaseStorage storage = FirebaseStorage.instance;
-                                                  //   Reference ref = storage.ref().child("${auth.currentUser!.email.toString()}spa").child("images/${spaName.text}");
-                                                  //   UploadTask uploadTask = ref.putFile(profile_photo!);
-                                                  //   await uploadTask.whenComplete(() => print('Image uploaded to Firebase Storage'));
-                                                  //   String imageURL = await ref.getDownloadURL();
-                                                  //   print('Download URL: $imageURL');
-                                                  //
-                                                  //   QuerySnapshot snap =  await snapcom.get();
-                                                  //   int count = snap.docs.length;
-                                                  //
-                                                  //
-                                                  //
-                                                  //   await snapcom.doc('${count+1}').set({
-                                                  //     'id':'${count+1}',
-                                                  //     'spaname':spaName.text,
-                                                  //     'location':location.text,
-                                                  //     'available':dropdownvalue.toString(),
-                                                  //     'imgurl':imageURL.toString()
-                                                  //   });
-                                                  // }on FirebaseException catch(e){
-                                                  //   Fluttertoast.showToast(msg: e.message.toString());
-                                                  //   loading(false);
-                                                  // }finally{
-                                                  _addSpa.addspa(spaName.text, location.text, dropdownvalue.toString(), spa_photo!,auth.currentUser!.email.toString(),utype.toString());
-
-                                                },
-
-
-                                                child: Container(
-                                                  alignment: Alignment.center,
-                                                  width: w*0.22,
-                                                  height: h*0.055,
+                                            child: Stack(
+                                              children: [
+                                                Container(
+                                                  width: 80,
+                                                  height: 80,
                                                   decoration: BoxDecoration(
-                                                      color: golden,
-                                                      border: Border.all(color: golden),
-                                                      borderRadius: BorderRadius.circular(10)
+                                                      image: DecorationImage(fit: BoxFit.fill,image: spa_photo!= null ? FileImage(spa_photo!):AssetImage("assets/images/ahmedabad.png",) as ImageProvider),
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.white,
+                                                      border: Border.all(color: golden)
                                                   ),
-                                                  child:Text("Save",style: TextStyle(color: Colors.white),),
                                                 ),
+                                                Positioned(
+                                                  left: 45,
+                                                  top: 59,
+                                                  child: Container(
+                                                    width: 25,
+                                                    height: 25,
+                                                    color: Colors.white,
+                                                    child: Icon(Icons.camera_alt_outlined,color: golden,),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: h*0.05,),
+                                          Container(
+                                            width: w*0.9,
+                                            height: h*0.055,
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(10),
+                                                border: Border.all(color: golden)
+                                            ),
+                                            child: TextFormField(
+                                              controller: spaName,
+                                              autofocus: false,
+                                              cursorColor: Colors.black,
+                                              decoration: InputDecoration(
+                                                hintText: "Enter Spa Name",
+                                                prefixIcon: Icon(Icons.drive_file_rename_outline,),
+                                                prefixIconColor: Colors.black54,
+                                                border: InputBorder.none,
                                               ),
-                                            );
-                                          }
-                                        )
-                                      ],
+                                            ),
+                                          ),
+                                          SizedBox(height: h*0.02,),
+
+                                          Container(
+                                            width: w*0.9,
+                                            height: h*0.055,
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(10),
+                                                border: Border.all(color: golden)
+                                            ),
+                                            child: TextFormField(
+                                              controller: apartment_controller,
+                                              autofocus: false,
+                                              cursorColor: Colors.black,
+                                              decoration: InputDecoration(
+                                                hintText: "Flat,House No.,Building,Company,Apartment",
+                                                prefixIcon: Icon(Icons.apartment,),
+                                                prefixIconColor: Colors.black54,
+                                                border: InputBorder.none,
+
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: h*0.02,),
+                                          Container(
+                                            width: w*0.9,
+                                            height: h*0.055,
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(10),
+                                                border: Border.all(color: golden)
+                                            ),
+                                            child: TextFormField(
+                                              controller: area_controller,
+                                              autofocus: false,
+                                              cursorColor: Colors.black,
+                                              decoration: InputDecoration(
+                                                hintText: "Area,Street,Sector,Village",
+                                                prefixIcon: Icon(Icons.streetview,),
+                                                prefixIconColor: Colors.black54,
+                                                border: InputBorder.none,
+
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: h*0.02,),
+                                          Container(
+                                            width: w*0.9,
+                                            height: h*0.055,
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(10),
+                                                border: Border.all(color: golden)
+                                            ),
+                                            child: TextFormField(
+                                              controller: city_controller,
+                                              autofocus: false,
+                                              cursorColor: Colors.black,
+                                              decoration: InputDecoration(
+                                                hintText: "Town/City",
+                                                prefixIcon: Icon(Icons.location_city,),
+                                                prefixIconColor: Colors.black54,
+                                                border: InputBorder.none,
+
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: h*0.02,),
+                                          Container(
+                                            width: w*0.9,
+                                            decoration: BoxDecoration(
+                                                border: Border.all(color: golden),
+                                                borderRadius: BorderRadius.circular(15)
+                                            ),
+                                            child: DropdownButton(
+                                              // Initial Value
+                                              value: dropdownvalue,
+                                              // Down Arrow Icon
+                                              icon: Padding(
+                                                padding: const EdgeInsets.only(right: 12.0),
+                                                child: const Icon(Icons.keyboard_arrow_down),
+                                              ),
+                                              onChanged: (String? newValue) {
+                                                setState(() {
+                                                  dropdownvalue = newValue!;
+                                                });
+                                              },
+                                              underline: Container(),
+                                              // Array list of items
+                                              isExpanded: true,
+                                              hint: Padding(
+                                                padding: const EdgeInsets.only(left: 10.0),
+                                                child: Text("Choose"),
+                                              ),
+                                              // alignment: Alignment.center,
+                                              items: [
+                                                DropdownMenuItem(
+                                                  value: 'OPEN',
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(left: 12.0),
+                                                    child: Text("Open",style: TextStyle(fontWeight: FontWeight.w500),),
+                                                  ),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: 'CLOSE',
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(left: 12.0),
+                                                    child: Text("Close",style: TextStyle(fontWeight: FontWeight.w500),),
+                                                  ),
+                                                ),
+                                              ],
+                                              // After selecting the desired option, it will
+                                              // change button value to selected value
+                                            ),
+                                          ),
+                                          SizedBox(height: h*0.02,),
+                                          Obx(
+                                            () {
+                                              return Container(
+                                                child: _addSpa.addspaloading.value ? CircularProgressIndicator(color: Colors.black):
+                                                GestureDetector(
+                                                  onTap: () async {
+
+                                                    // _addSpa.addspa(spaName.text, location.text, dropdownvalue.toString(), spa_photo!,auth.currentUser!.email.toString(),utype.toString());
+                                                    _addSpa.addspa(spaName.text, apartment_controller.text, dropdownvalue.toString(), spa_photo!, auth.currentUser!.email.toString(), utype.toString(), area_controller.text, city_controller.text);
+                                                  },
+
+
+                                                  child: Container(
+                                                    alignment: Alignment.center,
+                                                    width: w*0.22,
+                                                    height: h*0.055,
+                                                    decoration: BoxDecoration(
+                                                        color: golden,
+                                                        border: Border.all(color: golden),
+                                                        borderRadius: BorderRadius.circular(10)
+                                                    ),
+                                                    child:Text("Save",style: TextStyle(color: Colors.white),),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   );
                                 }
@@ -386,7 +421,15 @@ class _vendorspalistsState extends State<vendorspalists> {
                                     style: TextStyle(color: Colors.white,fontSize: 15
                                     )),
                                 Text(
-                                    snapshot.data!.docs[index].get("location"),
+                                    snapshot.data!.docs[index].get("apartmnet"),
+                                    style: TextStyle(color: Colors.white,fontSize: 15
+                                    )),
+                                Text(
+                                    snapshot.data!.docs[index].get("area"),
+                                    style: TextStyle(color: Colors.white,fontSize: 15
+                                    )),
+                                Text(
+                                    snapshot.data!.docs[index].get("city"),
                                     style: TextStyle(color: Colors.white,fontSize: 15
                                     )),
                                 Text(

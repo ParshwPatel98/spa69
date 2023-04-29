@@ -52,6 +52,9 @@ class _addServicesState extends State<addServices> with SingleTickerProviderStat
     super.initState();
     // _goToSecondTab();
     getSpaName();
+    setState(() {
+      _selectedIndex.clear();
+    });
     getspaId();
     getutype();
 
@@ -109,7 +112,8 @@ final _addtherapiest = Get.put(allfunc());
             backgroundColor: Color(0xFF1F4B3E),
             leading: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  // Navigator.pop(context);
+                  print(spaId);
                 },
                 child: Icon(Icons.arrow_back)),
             title: Text("Add Services"),
@@ -514,34 +518,43 @@ final _addtherapiest = Get.put(allfunc());
                                            ),
                                          ),
                                          SizedBox(height: h*0.02,),
-                                         InkWell(
-                                           onTap: () async {
+                                         Obx(
+                                            () {
+                                             return Container(
+                                               child:_addtherapiest.addtherapistloading.value?CircularProgressIndicator(color: Colors.black):
+                                               GestureDetector(
+                                                 onTap: () async {
 
-                                               // _addtherapiest.addtherapiest(_therapiest_name.text, _therapiest_title.text, _therapiest_working_days.text, _therapiest_working_hours.text, spaName.toString(), spaId.toString(), profile_photo!);
-                                                      _addtherapiest.addtherapiest(
-                                                          utype.toString(),
-                                                          _auth.currentUser!.email.toString(),
-                                                          _therapiest_name.text,
-                                                          _therapiest_title.text,
-                                                          _therapiest_working_days.text,
-                                                          _therapiest_working_hours.text,
-                                                          spaName.toString(),
-                                                          spaId.toString(),
-                                                          therapist_photo!
-                                                      );
-                                             print(utype);
-                                           },
-                                           child: Container(
-                                             alignment: Alignment.center,
-                                             width: w*0.9,
-                                             height: h*0.06,
-                                             // color: Colors.black,
-                                             decoration: BoxDecoration(
-                                                 color: golden,
-                                                 borderRadius: BorderRadius.circular(15)
-                                             ),
-                                             child: Text("Save",style: TextStyle(fontSize: 25,color: Colors.white),),
-                                           ),
+                                                     // _addtherapiest.addtherapiest(_therapiest_name.text, _therapiest_title.text, _therapiest_working_days.text, _therapiest_working_hours.text, spaName.toString(), spaId.toString(), profile_photo!);
+                                                     //        _addtherapiest.addtherapiest(
+                                                     //            utype.toString(),
+                                                     //            _auth.currentUser!.email.toString(),
+                                                     //            _therapiest_name.text,
+                                                     //            _therapiest_title.text,
+                                                     //            _therapiest_working_days.text,
+                                                     //            _therapiest_working_hours.text,
+                                                     //            spaName.toString(),
+                                                     //            spaId.toString(),
+                                                     //            therapist_photo!
+                                                     //        );
+
+                                                   _addtherapiest.addtherapiest(_auth.currentUser!.email.toString(), _therapiest_name.text, _therapiest_title.text,_therapiest_working_days.text, _therapiest_working_hours.text,spaName.toString(), spaId.toString(), therapist_photo!);
+                                                   print(utype);
+                                                 },
+                                                 child: Container(
+                                                   alignment: Alignment.center,
+                                                   width: w*0.9,
+                                                   height: h*0.06,
+                                                   // color: Colors.black,
+                                                   decoration: BoxDecoration(
+                                                       color: golden,
+                                                       borderRadius: BorderRadius.circular(15)
+                                                   ),
+                                                   child: Text("Save",style: TextStyle(fontSize: 25,color: Colors.white),),
+                                                 ),
+                                               ),
+                                             );
+                                           }
                                          ),
                                          SizedBox(height: h*0.02,)
                                        ],
@@ -669,15 +682,13 @@ final _addtherapiest = Get.put(allfunc());
                 child: GestureDetector(
                   onTap: () async {
 
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) => VendorHomeScreen(),));
                     if(_tabController.index == 0){
                       _tabController.animateTo(1);
                     }else if (_tabController.index == 1){
 
                       _tabController.animateTo(2);
                     }else{
-                    // _addtherapiest.addservices(spaName.toString(), _therapiest_name.text, _service_photo!, spaId.toString(), _add_services.text, _description.text, _add_price.text, _selectedIndex.toString());
-                      -_addtherapiest.addservices(utype.toString(),
+                      _addtherapiest.addservices(utype.toString(),
                           _auth.currentUser!.email.toString(),
                           spaName.toString(),
                           _therapiest_name.text,
@@ -689,13 +700,16 @@ final _addtherapiest = Get.put(allfunc());
                           _selectedIndex
                       );
                       print(spaId);
+                      print(_selectedIndex);
+
+
+
                     }
-                    print(_tabController.index);
-                    _selectedIndex.clear();
+
+                    // print(_tabController.index);
+
                   },
                   child: Container(
-
-
                     alignment: Alignment.center,
                     width: w*0.9,
                     height: 50,

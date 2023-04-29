@@ -48,6 +48,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
 
     spaName = sf.getString('spaName');
     });
+
   }
 
   getspaId() async {
@@ -85,7 +86,8 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
             backgroundColor: Color(0xFF1F4B3E),
             leading: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  // Navigator.pop(context);
+
                 },
                 child: Icon(Icons.arrow_back)),
             title: Text("Home Screen"),
@@ -362,34 +364,28 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                         ),
                                       ),
                                       SizedBox(height: h*0.02,),
-                                      InkWell(
-                                        onTap: () async {
+                                      Obx(
+                                         () {
+                                          return
+                                            _addtherapiest.addtherapistloading.value?CircularProgressIndicator():
+                                            InkWell(
+                                            onTap: () async {
 
-
-                                          _addtherapiest.addtherapiest(
-                                              utype.toString(),
-                                              _auth.currentUser!.email.toString(),
-                                              _therapiest_name.text,
-                                              _therapiest_title.text,
-                                              _therapiest_working_days.text,
-                                              _therapiest_working_hours.text,
-                                              spaName.toString(),
-                                              spaId.toString(),
-
-                                              profile_photo!
+                                              _addtherapiest.addtherapiest(_auth.currentUser!.email.toString(), _therapiest_name.text, _therapiest_title.text,_therapiest_working_days.text, _therapiest_working_hours.text,spaName.toString(), spaId.toString(), profile_photo!);
+                                            },
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              width: w*0.9,
+                                              height: h*0.06,
+                                              // color: Colors.black,
+                                              decoration: BoxDecoration(
+                                                  color: golden,
+                                                  borderRadius: BorderRadius.circular(15)
+                                              ),
+                                              child: Text("Save",style: TextStyle(fontSize: 25,color: Colors.white),),
+                                            ),
                                           );
-                                        },
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          width: w*0.9,
-                                          height: h*0.06,
-                                          // color: Colors.black,
-                                          decoration: BoxDecoration(
-                                              color: golden,
-                                              borderRadius: BorderRadius.circular(15)
-                                          ),
-                                          child: Text("Save",style: TextStyle(fontSize: 25,color: Colors.white),),
-                                        ),
+                                        }
                                       ),
                                       SizedBox(height: h*0.02,)
                                     ],
@@ -550,16 +546,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
 
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.center,
-                    width: w*0.95,
-                    height: h*0.05,
-                    decoration: BoxDecoration(
-                      color: golden,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Text("Save",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w500),),
-                  )
+
                 ],
               ),
             ),
@@ -613,7 +600,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                           return Center(child: CircularProgressIndicator(),);
                           }
                           else if(snapshot.data!.docs.isEmpty){
-                          return Center(child: Text("No Spa FOund"),);
+                          return Center(child: Text("No Service Found"),);
                           }
                           else{
                             return ListView.separated(
@@ -625,14 +612,13 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                                     therapistname.clear();
 
 
-                                    QuerySnapshot snapserv=await FirebaseFirestore.instance.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc("${spaId.toString()}").collection('services').get();
+                                    QuerySnapshot snapserv=await FirebaseFirestore.instance.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc(spaId.toString()).collection('services').get();
                                     for(int i=0;i<snapserv.docs[index]["selected_terapiest"].length;i++){
-                                      await _fstore.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc("${spaId.toString()}").collection('therapiest').doc(snapserv.docs[index]["selected_terapiest"][i])
+                                      await _fstore.collection(utype.toString()).doc(_auth.currentUser!.email.toString()).collection('Spas').doc(spaId.toString()).collection('therapiest').doc(snapserv.docs[index]["selected_terapiest"][i])
                                           .get().then((DocumentSnapshot) {
                                         setState(() {
                                           therapistname.add(DocumentSnapshot.get("name").toString());
                                         });
-
                                         print(DocumentSnapshot.get("name").toString());
                                       }
                                       );
@@ -802,19 +788,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Container(
-                      alignment: Alignment.center,
-                      width: w*0.95,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: golden,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text("Save",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w500),),
-                    ),
-                  ),
+
                 ],
               ),
             ),
